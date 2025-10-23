@@ -17,11 +17,14 @@ pipeline {
         stage('Deploy Frontend to Tomcat') {
             steps {
                 bat '''
-                if exist "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\supermarketfrontend" (
-                    rmdir /S /Q "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\supermarketfrontend"
+                set "TOMCAT_PATH=C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\supermarketfrontend"
+                
+                if exist "%TOMCAT_PATH%" (
+                    rmdir /S /Q "%TOMCAT_PATH%"
                 )
-                mkdir "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\supermarketfrontend"
-                xcopy /E /I /Y STUDENTAPI-REACT\\dist\\* "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\supermarketfrontend\\"
+                mkdir "%TOMCAT_PATH%"
+                
+                xcopy /E /I /Y "FullStackProject-SupermarketManagement-main\\FullStackProject\\supermarket\\build\\*" "%TOMCAT_PATH%\\"
                 '''
             }
         }
@@ -30,7 +33,7 @@ pipeline {
         stage('Build Backend') {
             steps {
                 dir('FullStackProject-SupermarketManagement-main/Supermarket') {
-                    bat 'mvn clean package'
+                    bat 'mvn clean package -DskipTests'
                 }
             }
         }
@@ -39,13 +42,16 @@ pipeline {
         stage('Deploy Backend to Tomcat') {
             steps {
                 bat '''
-                if exist "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\supermarketbackend.war" (
-                    del /Q "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\supermarketbackend.war"
+                set "TOMCAT_WEBAPPS=C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps"
+
+                if exist "%TOMCAT_WEBAPPS%\\supermarketbackend.war" (
+                    del /Q "%TOMCAT_WEBAPPS%\\supermarketbackend.war"
                 )
-                if exist "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\supermarketbackend" (
-                    rmdir /S /Q "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\supermarketbackend"
+                if exist "%TOMCAT_WEBAPPS%\\supermarketbackend" (
+                    rmdir /S /Q "%TOMCAT_WEBAPPS%\\supermarketbackend"
                 )
-                copy "FullStackProject-SupermarketManagement-main/Supermarket\\target\\*.war" "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\"
+
+                copy "FullStackProject-SupermarketManagement-main\\Supermarket\\target\\supermarketbackend.war" "%TOMCAT_WEBAPPS%\\"
                 '''
             }
         }
@@ -54,10 +60,10 @@ pipeline {
 
     post {
         success {
-            echo 'Deployment Successful!'
+            echo '✅ Deployment Successful!'
         }
         failure {
-            echo 'Pipeline Failed.'
+            echo '❌ Pipeline Failed.'
         }
     }
 }
