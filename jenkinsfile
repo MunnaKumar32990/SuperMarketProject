@@ -6,7 +6,7 @@ pipeline {
         // ===== FRONTEND BUILD =====
         stage('Build Frontend') {
             steps {
-                dir('FullStackProject-SupermarketManagement-main/FullStackProject/supermarket') {
+                dir('FullStackProject/supermarket') {
                     bat 'npm install'
                     bat 'npm run build'
                 }
