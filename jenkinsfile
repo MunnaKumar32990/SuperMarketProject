@@ -6,11 +6,11 @@ pipeline {
         // ===== FRONTEND BUILD =====
       stage('Build Frontend') {
     steps {
-        dir('FullStackProject/supermarket') {
-            // Use legacy peer deps + ignore CI warnings
-            bat 'npm install --legacy-peer-deps'
-            bat 'set CI=false && npm run build'
-        }
+    dir('FullStackProject/supermarket') {
+    bat 'npm install --legacy-peer-deps'
+    bat 'npm run build'
+}
+
     }
 }
 
